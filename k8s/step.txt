@@ -1,0 +1,8 @@
+RUN KUBERNETES
+minikube start
+kubectl get nodes
+minikube dashboard
+
+RUN RAY
+
+kubectl apply -f mlflow_service.yaml

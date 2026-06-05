@@ -1,0 +1,15 @@
+---
+working_dir: "./"
+pip:
+  - numpy
+  - joblib
+  - scikit-learn==1.4.2
+  - mlflow==2.21.3
+  - boto3
+  - requests>=2.31.0,<3
+  - openpyxl
+env_vars:
+  MLFLOW_TRACKING_URI: "https://atomik31-mlflow-server.hf.space"
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  BUCKET_NAME: "projet-final-dsl-ft37-julien-charlier"

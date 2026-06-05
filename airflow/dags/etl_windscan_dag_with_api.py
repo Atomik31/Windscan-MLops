@@ -2,17 +2,15 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.utils.task_group import TaskGroup
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-from operators.s3_to_postgres import S3ToPostgresOperator
-
 from tasks_with_api.extract_windscan import extract_dataset_batch_to_s3
-from tasks_with_api.transform_predict_windscan import predict_with_model_turbine
+from tasks_with_api.validate_load_sensors import validate_and_load_sensors
+from tasks_with_api.predict_and_store import predict_and_store
 
 
 default_args = {
-    "owner": "Julien",
+    "owner": "Julien.CHARLIER",
     "retries": 1,
     "retry_delay": timedelta(minutes=1),
 }
@@ -27,7 +25,48 @@ with DAG(
 ) as dag:
 
     # =========================
-    # 1) Extract
+    # 0) Création des tables si elles n'existent pas
+    # =========================
+    create_tables = PostgresOperator(
+        task_id="create_tables",
+        postgres_conn_id="postgres_default",
+        sql="""
+        CREATE TABLE IF NOT EXISTS wind_turbine_sensors (
+            id                       SERIAL PRIMARY KEY,
+            turbine_id               INTEGER,
+            rotor_speed_rpm          NUMERIC,
+            wind_speed_mps           NUMERIC,
+            power_output_kw          NUMERIC,
+            gearbox_oil_temp_c       NUMERIC,
+            generator_bearing_temp_c NUMERIC,
+            vibration_level_mmps     NUMERIC,
+            ambient_temp_c           NUMERIC,
+            humidity_pct             NUMERIC,
+            maintenance_label        INTEGER,
+            created_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS wind_turbine_predictions (
+            id                       SERIAL PRIMARY KEY,
+            sensor_id                INTEGER REFERENCES wind_turbine_sensors(id),
+            turbine_id               INTEGER,
+            rotor_speed_rpm          NUMERIC,
+            wind_speed_mps           NUMERIC,
+            power_output_kw          NUMERIC,
+            gearbox_oil_temp_c       NUMERIC,
+            generator_bearing_temp_c NUMERIC,
+            vibration_level_mmps     NUMERIC,
+            ambient_temp_c           NUMERIC,
+            humidity_pct             NUMERIC,
+            maintenance_label        INTEGER,
+            prediction               INTEGER,
+            created_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+    )
+
+    # =========================
+    # 1) Extract — dernière ligne du dataset S3
     # =========================
     extract_task = PythonOperator(
         task_id="extract_raw_turbine_batch",
@@ -36,55 +75,21 @@ with DAG(
     )
 
     # =========================
-    # 2) Transform / Predict via API
+    # 2) Validate + Load — schéma, qualité, insertion dans wind_turbine_sensors
     # =========================
-    transform = PythonOperator(
-        task_id="predict_with_model_turbine",
-        python_callable=predict_with_model_turbine,
+    validate_load = PythonOperator(
+        task_id="validate_and_load_sensors",
+        python_callable=validate_and_load_sensors,
         provide_context=True,
     )
 
-    # extract then transform
-    extract_task >> transform
-
     # =========================
-    # 3) LOAD (Postgres)
+    # 3) Predict + Store — lit Neon DB, appelle /predict, stocke dans wind_turbine_predictions
     # =========================
-    with TaskGroup(group_id="load_branch") as load_branch:
+    predict_store = PythonOperator(
+        task_id="predict_and_store",
+        python_callable=predict_and_store,
+        provide_context=True,
+    )
 
-        create_predictions_table = PostgresOperator(
-            task_id="create_predictions_table",
-            sql="""
-            CREATE TABLE IF NOT EXISTS wind_turbine_predictions (
-                id SERIAL PRIMARY KEY,
-                Hour_Index NUMERIC,
-                Turbine_ID INTEGER,
-                Rotor_Speed_RPM NUMERIC,
-                Wind_Speed_mps NUMERIC,
-                Power_Output_kW NUMERIC,
-                Gearbox_Oil_Temp_C NUMERIC,
-                Generator_Bearing_Temp_C NUMERIC,
-                Vibration_Level_mmps NUMERIC,
-                Ambient_Temp_C NUMERIC,
-                Humidity_pct NUMERIC,
-                Maintenance_Label INTEGER,
-                prediction INTEGER,
-                target_actual INTEGER,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            """,
-            postgres_conn_id="postgres_default",
-        )
-
-        transfer_predictions_to_postgres = S3ToPostgresOperator(
-            task_id="transfer_predictions_to_postgres",
-            table="wind_turbine_predictions",
-            bucket="{{ var.value.S3BucketName }}",
-            key="{{ task_instance.xcom_pull(task_ids='predict_with_model_turbine', key='turbine_predictions_s3_key') }}",
-            postgres_conn_id="postgres_default",
-            aws_conn_id="aws_default",
-        )
-
-        create_predictions_table >> transfer_predictions_to_postgres
-
-    transform >> load_branch
+    create_tables >> extract_task >> validate_load >> predict_store

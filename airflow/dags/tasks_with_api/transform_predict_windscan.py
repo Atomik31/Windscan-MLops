@@ -1,7 +1,6 @@
 import json
 import requests
 import pandas as pd
-from datetime import datetime
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.models import Variable
@@ -10,8 +9,7 @@ from airflow.models import Variable
 def predict_with_model_turbine(**context):
     """
     Read extracted raw turbine batch from S3,
-    call model serving API for each row, save predictions CSV to S3,
-    then push output S3 key via XCom.
+    call model serving API for each row, push predictions via XCom.
     """
     ti = context["task_instance"]
 
@@ -26,9 +24,7 @@ def predict_with_model_turbine(**context):
     request_timeout = int(
         Variable.get("WINDSCAN_MODEL_API_TIMEOUT", default_var="120")
     )
-
     bucket = Variable.get("S3BucketName")
-    s3_prefix_predictions = Variable.get("WINDSCAN_S3_PRED_PREFIX")
 
     # =========================
     # 2) Pull raw extract S3 key from XCom
@@ -49,14 +45,10 @@ def predict_with_model_turbine(**context):
         bucket_name=bucket,
         local_path="/tmp",
     )
-    
-    print(
-        f"[INFO] Downloaded raw batch: s3://{bucket}/{raw_s3_key} -> {local_raw_path}"
-    )
+    print(f"[INFO] Downloaded raw batch: s3://{bucket}/{raw_s3_key} -> {local_raw_path}")
 
-    # Read CSV directly (turbine data is in CSV format)
     df = pd.read_csv(local_raw_path)
-    
+
     # =========================
     # 4) Filter features (exclude Target and Split columns)
     # =========================
@@ -73,19 +65,16 @@ def predict_with_model_turbine(**context):
         "Humidity_pct",
         "Maintenance_Label",
     ]
-    
-    # Ensure all feature columns exist
     missing_cols = set(feature_columns) - set(df.columns)
     if missing_cols:
         raise ValueError(f"Missing required columns: {missing_cols}")
-    
+
     features = df[feature_columns].copy()
     print(f"[INFO] Features dataframe prepared: shape={features.shape}")
 
     # =========================
     # 5) Call prediction API row by row
     # =========================
-    # Handle both cases: endpoint is either a path (/predict) or full URL
     if model_api_predict_endpoint.startswith(("http://", "https://")):
         predict_url = model_api_predict_endpoint
     else:
@@ -94,29 +83,17 @@ def predict_with_model_turbine(**context):
     predictions = []
 
     for idx, row in features.iterrows():
-        # Convert pandas/numpy types to native JSON types
         payload = json.loads(row.to_json())
-
         try:
             print(f"[DEBUG] Row {idx} payload: {payload}")
-            response = requests.post(
-                predict_url,
-                json=payload,
-                timeout=request_timeout,
-            )
+            response = requests.post(predict_url, json=payload, timeout=request_timeout)
             response.raise_for_status()
-
             result = response.json()
             prediction = result.get("prediction")
-
-            # Handle list response from API
             if isinstance(prediction, list) and len(prediction) > 0:
                 prediction = prediction[0]
-
             predictions.append(prediction)
-
             print(f"[INFO] Prediction OK for row {idx}: {prediction}")
-
         except Exception as e:
             print(f"[ERROR] Prediction failed for row {idx}: {e}")
             print(f"[DEBUG] Response status: {getattr(e.response, 'status_code', 'N/A')}")
@@ -129,34 +106,12 @@ def predict_with_model_turbine(**context):
     result_df = features.copy()
     result_df["prediction"] = predictions
 
-    # Add original Target if it exists in source for validation
     if "Target" in df.columns:
         result_df["target_actual"] = df["Target"].values
 
     # =========================
-    # 7) Save CSV locally then upload to S3
+    # 7) Push predictions via XCom (pas de transit S3)
     # =========================
-    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    predictions_filename = f"{ts}_windscan_predictions.csv"
-    local_results = f"/tmp/{predictions_filename}"
-    result_df.to_csv(local_results, index=False)
-
-    s3_key_predictions = f"{s3_prefix_predictions}/{predictions_filename}"
-
-    s3_hook.load_file(
-        filename=local_results,
-        key=s3_key_predictions,
-        bucket_name=bucket,
-        replace=True,
-    )
-
-    # =========================
-    # 8) Push XComs
-    # =========================
-    ti.xcom_push(key="turbine_predictions_s3_key", value=s3_key_predictions)
+    ti.xcom_push(key="turbine_predictions_json", value=result_df.to_json(orient="records"))
     ti.xcom_push(key="turbine_predictions_count", value=len(result_df))
-
-    print(
-        f"[INFO] Predictions saved: s3://{bucket}/{s3_key_predictions} "
-        f"(rows={len(result_df)})"
-    )
+    print(f"[INFO] {len(result_df)} predictions pushed via XCom")

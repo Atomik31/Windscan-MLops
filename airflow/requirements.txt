@@ -6,3 +6,4 @@ mlflow==2.21.3
 scikit-learn==1.4.2
 boto3
 openpyxl
+evidently==0.4.33
