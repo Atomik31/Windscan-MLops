@@ -24,22 +24,9 @@ Une API FastAPI charge le modèle depuis MLflow au démarrage et expose deux end
 
 **Pipeline d'inférence — DAG Airflow**
 
-Un DAG se déclenche manuellement et enchaîne 3 tâches :
+Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables, extraction d'une ligne aléatoire du dataset de test S3, validation + chargement dans `wind_turbine_sensors`, puis inférence via l'API et stockage dans `wind_turbine_predictions`. Un DAG de monitoring tourne quotidiennement avec Evidently pour détecter le drift et déclencher automatiquement le réentraînement.
 
-```
-┌─────────────────────┐     ┌──────────────────────┐     ┌───────────────────────┐     ┌─────────────┐
-│     1. Extract      │────▶│      2. Predict       │────▶│       3. Load         │────▶│   Neon DB   │
-│ extrait la dernière │     │ appelle l'API /predict │     │ XCom → PostgreSQL     │     │ (PostgreSQL)│
-│ ligne du dataset S3 │     │ ligne par ligne        │     │ wind_turbine_         │     │             │
-│                     │     │ predictions → XCom     │     │ predictions           │     │             │
-└─────────────────────┘     └──────────┬───────────┘     └───────────────────────┘     └─────────────┘
-                                       │ POST /predict
-                                       ▼
-                             atomik31-model-serv-api
-                                  .hf.space
-```
-
-Les prédictions transitent entre les tâches via XCom (JSON) et sont insérées directement dans Neon DB.
+![Lignage de la donnée WINDSCAN](docs/windscan_lignage_donnees.svg)
 
 ---
 
@@ -58,32 +45,7 @@ Les prédictions transitent entre les tâches via XCom (JSON) et sont insérées
 
 ## Architecture
 
-```
-                    ENTRAINEMENT
- ┌───────────────────────────────────────────────────┐
- │  Kubernetes (Minikube)                            │
- │  ┌─────────────┐   ┌─────────────┐               │
- │  │  Ray Head   │◀─▶│ Ray Workers │               │
- │  └──────┬──────┘   └─────────────┘               │
- │         │  train_with_ray.py                      │
- │         │  (RF + GridSearchCV, cv=3 folds)        │
- └─────────┼─────────────────────────────────────────┘
-           │ log model
-           ▼
-   ┌───────────────────────┐     load at startup     ┌──────────────────────────┐
-   │  MLflow (HF Spaces)   │────────────────────────▶│  FastAPI (HF Spaces)     │
-   │  turbine_maintenance  │                          │  /health  /predict        │
-   │  _predictor  v5       │                          └──────────────────────────┘
-   └───────────────────────┘                                      ▲
-                                                                  │ POST /predict
-                    INFERENCE BATCH                               │
- ┌────────────────────────────────────────────────────────────────┼──────┐
- │  Apache Airflow — etl_WINDSCAN_dag                             │      │
- │                                                                │      │
- │  [Extract]──▶[Predict]──────────────────────────────────────────      │
- │               └──▶ [Load] ──▶ Neon DB (wind_turbine_predictions)      │
- └───────────────────────────────────────────────────────────────────────┘
-```
+![Architecture MLOps WINDSCAN](docs/windscan_lignage_donnees.svg)
 
 ---
 
@@ -108,12 +70,14 @@ Projet-final/
 │   └── Dockerfile                   # MLflow server sur HF Spaces
 ├── airflow/
 │   ├── dags/
-│   │   ├── etl_WINDSCAN_dag_with_api.py       # DAG principal (turbines)
-│   │   ├── etl_attrition_dag_with_pkl.py      # DAG secondaire (IBM)
+│   │   ├── etl_WINDSCAN_dag_with_api.py       # DAG ETL + inférence (turbines)
+│   │   ├── monitoring_dag.py                  # DAG monitoring drift (Evidently, @daily)
+│   │   ├── retraining_dag.py                  # DAG réentraînement Ray (déclenché par monitoring)
+│   │   ├── etl_attrition_dag_with_pkl.py      # DAG secondaire (IBM attrition)
 │   │   └── tasks_with_api/
-│   │       ├── extract_windscan.py             # Tache 1 : extraction S3
-│   │       ├── transform_predict_windscan.py   # Tache 2 : appel API + predictions
-│   │       └── load_to_postgres.py             # Tache 3 : XCom → Neon DB
+│   │       ├── extract_windscan.py             # Tache 1 : extraction S3 aléatoire
+│   │       ├── validate_load_sensors.py        # Tache 2 : validation + wind_turbine_sensors
+│   │       └── predict_and_store.py            # Tache 3 : inférence + wind_turbine_predictions
 │   ├── docker-compose.yaml
 │   └── Dockerfile
 ├── Deployment.md                    # Commandes de deploiement pas a pas
