@@ -18,7 +18,7 @@ FEATURE_COLUMNS = [
     "ambient_temp_c", "humidity_pct", "maintenance_label",
 ]
 
-MIN_ROWS_FOR_DETECTION = 10  # nombre minimum de lignes pour évaluer le drift
+MIN_ROWS_FOR_DETECTION = 100  # nombre minimum de lignes pour évaluer le drift (évite les faux positifs)
 
 
 def check_data_drift(**context):

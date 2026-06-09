@@ -27,34 +27,21 @@ mlflow.set_experiment("turbine_maintenance_ray_distributed")
 ray.init(ignore_reinit_error=True)
 
 
-def load_data_from_local():
-    """Load turbine maintenance dataset from local CSV file."""
-    data_filepath = "dataset_train.csv"
-    return pd.read_csv(data_filepath, index_col=0)
-
-
-def download_data_from_s3():
-    """Load turbine maintenance dataset from S3 (optional)."""
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "eu-north-1")
-    S3_BUCKET = os.getenv("BUCKET_NAME")
-
+def load_data_from_s3():
+    """Télécharge le dataset d'entraînement depuis S3 — source unique de vérité."""
     s3 = boto3.client(
         "s3",
-        region_name=AWS_REGION,
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        region_name=os.getenv("AWS_DEFAULT_REGION", "eu-north-1"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     )
 
-    data_filepath = "data/dataset_train.csv"
-    filename = "temp/dataset_train.csv"
+    s3_key = "data/dataset_train.csv"
+    local_path = "/tmp/dataset_train.csv"
 
-    if not os.path.exists("temp"):
-        os.makedirs("temp")
-
-    s3.download_file(Bucket=S3_BUCKET, Key=data_filepath, Filename=filename)
-    return pd.read_csv(filename, index_col=0)
+    print(f"Téléchargement du dataset depuis s3://{os.getenv('BUCKET_NAME')}/{s3_key}...")
+    s3.download_file(Bucket=os.getenv("BUCKET_NAME"), Key=s3_key, Filename=local_path)
+    return pd.read_csv(local_path, index_col=0)
 
 
 if __name__ == "__main__":
@@ -64,12 +51,8 @@ if __name__ == "__main__":
     parser.add_argument("--min_samples_split", type=int, default=2)
     args = parser.parse_args()
 
-    # 2. Chargement et préparation des données
-    try:
-        df = load_data_from_local()
-    except FileNotFoundError:
-        print("Local dataset not found, attempting to download from S3...")
-        df = download_data_from_s3()
+    # 2. Chargement des données depuis S3
+    df = load_data_from_s3()
 
     # Remove Split column if present (used for manual train/test split)
     if "Split" in df.columns:
@@ -151,12 +134,9 @@ if __name__ == "__main__":
 
             if latest_versions:
                 model_version = latest_versions[-1].version
-                # Nouveau modèle → staging pour validation avant promotion
                 client.set_registered_model_alias(
-                    name=model_name, alias="staging", version=model_version
+                    name=model_name, alias="production", version=model_version
                 )
-                print(f"[INFO] Modèle version {model_version} marqué comme 'staging'")
-                # Pour promouvoir en production :
-                # client.set_registered_model_alias(name=model_name, alias="production", version=model_version)
+                print(f"[INFO] Modèle version {model_version} marqué comme 'production'")
 
     print("...Done!")

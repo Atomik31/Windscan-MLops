@@ -1,0 +1,143 @@
+<svg width="100%" viewBox="0 0 900 480" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>WindScan — Architecture MLOps complète</title>
+<desc>Vue d'ensemble du pipeline MLOps WindScan : entraînement distribué Ray/K8s, MLflow Registry, FastAPI sur HF Spaces, pipeline ETL Airflow, monitoring Evidently et réentraînement automatique.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<!-- Légende -->
+<rect x="60" y="16" width="12" height="12" rx="3" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="78" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Données</text>
+<rect x="175" y="16" width="12" height="12" rx="3" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="193" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Traitement</text>
+<rect x="305" y="16" width="12" height="12" rx="3" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="323" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Modèle / API</text>
+<rect x="440" y="16" width="12" height="12" rx="3" style="fill:rgb(90,30,30);stroke:rgb(220,100,100);stroke-width:0.5px;"/>
+<text x="458" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Monitoring / Réentraînement</text>
+
+<!-- ===== BANDE 1 : ENTRAÎNEMENT ===== -->
+<text x="450" y="54" text-anchor="middle" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:13px;font-style:italic;">Entraînement distribué</text>
+
+<rect x="20" y="64" width="155" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="97" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">dataset_train.csv</text>
+<text x="97" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">AWS S3</text>
+
+<line x1="175" y1="92" x2="188" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="190" y="64" width="155" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="267" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Ray Cluster · K8s</text>
+<text x="267" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">Random Forest · GridSearchCV</text>
+
+<line x1="345" y1="92" x2="358" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="360" y="64" width="155" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="437" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">MLflow Registry</text>
+<text x="437" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">turbine_predictor @production</text>
+
+<line x1="515" y1="92" x2="528" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="530" y="64" width="155" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="607" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">FastAPI · HF Spaces</text>
+<text x="607" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">POST /predict</text>
+
+<line x1="685" y1="92" x2="698" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="700" y="64" width="165" height="56" rx="8" style="fill:rgb(30,30,50);stroke:rgb(80,80,120);stroke-width:0.5px;"/>
+<text x="782" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(180,180,220);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">GitHub Actions</text>
+<text x="782" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(140,140,180);font-family:system-ui,sans-serif;font-size:11px;">CI/CD · tests + deploy HF</text>
+
+<!-- Séparateur 1 -->
+<line x1="10" y1="136" x2="880" y2="136" stroke-dasharray="4 4" style="stroke:rgb(60,60,60);stroke-width:1px;fill:none;"/>
+
+<!-- ===== BANDE 2 : PIPELINE ETL AIRFLOW ===== -->
+<text x="450" y="152" text-anchor="middle" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:13px;font-style:italic;">Pipeline Airflow — etl_WINDSCAN_dag</text>
+
+<rect x="20" y="162" width="155" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="97" y="182" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">test_data.csv</text>
+<text x="97" y="200" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">AWS S3</text>
+
+<line x1="175" y1="190" x2="188" y2="190" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="190" y="162" width="155" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="267" y="182" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">1. Extract</text>
+<text x="267" y="200" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">ligne aléatoire · S3 sample</text>
+
+<line x1="345" y1="190" x2="358" y2="190" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="360" y="162" width="155" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="437" y="182" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">2. Validate + Load</text>
+<text x="437" y="200" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">schéma · nulls · outliers</text>
+
+<line x1="515" y1="190" x2="528" y2="190" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="530" y="162" width="155" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="607" y="182" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">wind_turbine_sensors</text>
+<text x="607" y="200" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">Neon DB (PostgreSQL)</text>
+
+<line x1="685" y1="190" x2="698" y2="190" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="700" y="162" width="165" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="782" y="182" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">3. Predict + Store</text>
+<text x="782" y="200" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">POST /predict · stockage</text>
+
+<line x1="782" y1="218" x2="782" y2="230" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="700" y="232" width="165" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="782" y="252" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">wind_turbine_predictions</text>
+<text x="782" y="270" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">Neon DB (PostgreSQL)</text>
+
+<!-- FastAPI → Predict+Store (inférence) -->
+<path d="M 607 120 L 782 160" fill="none" stroke-dasharray="5 3" marker-end="url(#arrow)" style="stroke:rgb(93,202,165);stroke-width:1.5px;fill:none;"/>
+<text x="704" y="146" text-anchor="middle" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">inférence</text>
+
+<!-- Séparateur 2 -->
+<line x1="10" y1="302" x2="880" y2="302" stroke-dasharray="4 4" style="stroke:rgb(60,60,60);stroke-width:1px;fill:none;"/>
+
+<!-- ===== BANDE 3 : MONITORING + RÉENTRAÎNEMENT ===== -->
+<text x="450" y="318" text-anchor="middle" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:13px;font-style:italic;">monitoring_WINDSCAN_dag @daily</text>
+
+<rect x="20" y="328" width="185" height="66" rx="8" style="fill:rgb(90,30,30);stroke:rgb(220,100,100);stroke-width:0.5px;"/>
+<text x="112" y="348" text-anchor="middle" dominant-baseline="central" style="fill:rgb(255,180,180);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Evidently AI</text>
+<text x="112" y="366" text-anchor="middle" dominant-baseline="central" style="fill:rgb(220,130,130);font-family:system-ui,sans-serif;font-size:11px;">DataDriftPreset</text>
+<text x="112" y="383" text-anchor="middle" dominant-baseline="central" style="fill:rgb(220,130,130);font-family:system-ui,sans-serif;font-size:11px;">sensors vs S3 ref</text>
+
+<line x1="205" y1="361" x2="222" y2="361" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="224" y="328" width="140" height="66" rx="8" style="fill:rgb(30,30,50);stroke:rgb(80,80,120);stroke-width:0.5px;"/>
+<text x="294" y="352" text-anchor="middle" dominant-baseline="central" style="fill:rgb(180,180,220);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Drift détecté ?</text>
+<text x="294" y="370" text-anchor="middle" dominant-baseline="central" style="fill:rgb(140,140,180);font-family:system-ui,sans-serif;font-size:11px;">share_drifted > seuil</text>
+
+<!-- "oui" branch -->
+<line x1="364" y1="361" x2="382" y2="361" marker-end="url(#arrow)" style="stroke:rgb(220,100,100);stroke-width:1.5px;fill:none;"/>
+<text x="373" y="354" text-anchor="middle" style="fill:rgb(220,100,100);font-family:system-ui,sans-serif;font-size:11px;">oui</text>
+
+<rect x="384" y="328" width="165" height="66" rx="8" style="fill:rgb(90,30,30);stroke:rgb(220,100,100);stroke-width:0.5px;"/>
+<text x="466" y="352" text-anchor="middle" dominant-baseline="central" style="fill:rgb(255,180,180);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">trigger_retraining</text>
+<text x="466" y="370" text-anchor="middle" dominant-baseline="central" style="fill:rgb(220,130,130);font-family:system-ui,sans-serif;font-size:11px;">TriggerDagRunOperator</text>
+
+<line x1="549" y1="361" x2="566" y2="361" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+
+<rect x="568" y="328" width="165" height="66" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="650" y="352" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Ray job submit</text>
+<text x="650" y="370" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">train_with_ray.py · K8s</text>
+
+<!-- "non" branch -->
+<line x1="294" y1="394" x2="294" y2="410" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+<text x="306" y="406" style="fill:rgb(80,160,80);font-family:system-ui,sans-serif;font-size:11px;">non</text>
+<rect x="224" y="412" width="140" height="44" rx="8" style="fill:rgb(30,30,50);stroke:rgb(80,80,120);stroke-width:0.5px;"/>
+<text x="294" y="430" text-anchor="middle" dominant-baseline="central" style="fill:rgb(140,140,180);font-family:system-ui,sans-serif;font-size:12px;">modèle stable</text>
+<text x="294" y="447" text-anchor="middle" dominant-baseline="central" style="fill:rgb(120,120,160);font-family:system-ui,sans-serif;font-size:11px;">log OK · pas de relance</text>
+
+<!-- Ray → MLflow @staging -->
+<line x1="650" y1="394" x2="650" y2="410" marker-end="url(#arrow)" style="stroke:rgb(175,169,236);stroke-width:1.5px;fill:none;"/>
+<rect x="568" y="412" width="165" height="44" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="650" y="430" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">MLflow @production</text>
+<text x="650" y="447" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">nouveau modèle enregistré</text>
+
+<!-- wind_turbine_sensors → Evidently (dashed) -->
+<path d="M 530 218 L 530 272 L 112 272 L 112 326" fill="none" stroke-dasharray="5 3" marker-end="url(#arrow)" style="stroke:rgb(133,183,235);stroke-width:1.5px;fill:none;"/>
+<text x="320" y="266" text-anchor="middle" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">100 dernières lignes</text>
+
+</svg>
