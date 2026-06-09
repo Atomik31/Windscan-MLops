@@ -30,6 +30,10 @@ Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables,
 
 ![Architecture MLOps WINDSCAN](docs/windscan_mlops_pipeline.svg)
 
+### Demo pipeline
+
+[Voir la démo du pipeline en action](../DAG_WINDSCAN_demo.mov)
+
 ---
 
 ## Stack
