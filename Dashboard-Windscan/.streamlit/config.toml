@@ -1,0 +1,16 @@
+[server]
+port = 7860
+address = "0.0.0.0"
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = '#D48145'
+backgroundColor = '#2B2B30'
+secondaryBackgroundColor = '#1F1F24'
+textColor = '#E0E0E0'
+font = "sans serif"

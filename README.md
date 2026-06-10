@@ -28,6 +28,10 @@ Une API FastAPI charge le modèle depuis MLflow au démarrage et expose trois en
 
 Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables, extraction d'une ligne aléatoire du dataset de test S3, validation + chargement dans `wind_turbine_sensors`, puis inférence via l'API et stockage dans `wind_turbine_predictions`. Un DAG de monitoring tourne quotidiennement avec Evidently pour détecter le drift et déclencher automatiquement le réentraînement.
 
+**Dashboard de monitoring — Streamlit**
+
+Un dashboard Streamlit affiche l'état de la turbine 1 : données capteurs nettoyées (`wind_turbine_sensors` sur Neon DB, alimentée par le DAG Airflow), statistiques sur la fenêtre de temps sélectionnée, et le niveau de maintenance prédit par le modèle (`turbine_maintenance_predictor@production` chargé depuis MLflow). Déployé en conteneur Docker sur Hugging Face Spaces.
+
 ![Architecture MLOps WINDSCAN](docs/windscan_mlops_pipeline.svg)
 
 ### Demo pipeline
@@ -43,9 +47,11 @@ Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables,
 - Kubernetes — Minikube (cluster local)
 - Apache Airflow 2.10 (Docker Compose, LocalExecutor)
 - MLflow Model Registry (Hugging Face Spaces)
-- AWS S3 (données brutes + prédictions CSV en transit)
-- Neon DB (PostgreSQL managé — stockage final des prédictions)
-- Hugging Face Spaces (MLflow server + API de serving)
+- AWS S3 (données brutes en transit)
+- Neon DB (PostgreSQL managé — stockage des données capteurs et des prédictions)
+- Streamlit + Plotly (dashboard de monitoring)
+- Hugging Face Spaces (MLflow server, API de serving, dashboard)
+- GitHub Actions (CD — déploiement de l'API)
 
 ---
 
@@ -54,36 +60,50 @@ Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables,
 ```
 Projet-final/
 ├── docs/
-│   ├── windscan_mlops_pipeline.svg  # Schema architecture MLOps complet
-│   ├── windscan_lignage_donnees.svg # Lignage de la donnee
-│   └── project_overview_final.md   # Enonce du projet
+│   ├── windscan_mlops_pipeline.svg     # Schéma architecture MLOps complet
+│   ├── windscan_lignage_donnees.svg    # Lignage de la donnée
+│   └── project_overview_final.md       # Énoncé du projet
 ├── k8s/
+│   ├── README.md                       # Setup Minikube + KubeRay
 │   └── ray_cluster/
-│       ├── train_with_ray.py        # Script d'entrainement distribue
-│       ├── ray_cluster.yaml         # Helm values KubeRay
-│       ├── runtime.yaml             # Env Ray (dependances pip)
-│       ├── data/
-│       │   └── dataset_train.csv    # Dataset d'entraînement turbines (fallback local)
+│       ├── train_with_ray.py           # Script d'entraînement distribué
+│       ├── ray_cluster.yaml            # Helm values KubeRay
+│       ├── runtime.yaml                # Env Ray (dépendances pip + tracking URI MLflow)
 │       └── requirements.txt
-├── modelservedapi/
-│   ├── app.py                       # API FastAPI (/health + /predict)
-│   ├── Dockerfile
-│   └── requirements.txt
 ├── mlflowfinalproject/
-│   └── Dockerfile                   # MLflow server sur HF Spaces
+│   ├── Dockerfile                      # MLflow server sur HF Spaces
+│   ├── requirements.txt
+│   └── README.md
+├── modelservedapi/
+│   ├── app.py                          # API FastAPI (/health + /predict)
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── test_api.ipynb                  # Notebook de test de l'API
+│   └── README.md
+├── Dashboard-Windscan/
+│   ├── app.py                          # Dashboard Streamlit (monitoring turbine 1)
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── .streamlit/config.toml
 ├── airflow/
 │   ├── dags/
-│   │   ├── etl_WINDSCAN_dag_with_api.py       # DAG ETL + inférence (turbines)
+│   │   ├── etl_windscan_dag_with_api.py       # DAG ETL + inférence (turbines)
 │   │   ├── monitoring_dag.py                  # DAG monitoring drift (Evidently, @daily)
 │   │   ├── retraining_dag.py                  # DAG réentraînement Ray (déclenché par monitoring)
 │   │   ├── etl_attrition_dag_with_pkl.py      # DAG secondaire (IBM attrition)
-│   │   └── tasks_with_api/
-│   │       ├── extract_windscan.py             # Tache 1 : extraction S3 aléatoire
-│   │       ├── validate_load_sensors.py        # Tache 2 : validation + wind_turbine_sensors
-│   │       └── predict_and_store.py            # Tache 3 : inférence + wind_turbine_predictions
+│   │   ├── tasks_with_api/
+│   │   │   ├── extract_windscan.py             # Tâche 1 : extraction S3 aléatoire
+│   │   │   ├── validate_load_sensors.py        # Tâche 2 : validation + wind_turbine_sensors
+│   │   │   └── predict_and_store.py            # Tâche 3 : inférence API + wind_turbine_predictions
+│   │   └── tasks_with_pkl/                     # Tâches du DAG secondaire (IBM attrition)
 │   ├── docker-compose.yaml
 │   └── Dockerfile
-├── Deployment.md                    # Commandes de deploiement pas a pas
+├── .github/workflows/
+│   └── deploy_api.yml                  # CD : déploiement de modelservedapi sur HF Spaces
+├── scripts/
+│   └── seed_last_100_hours.py          # One-shot : seed wind_turbine_sensors/predictions (100h)
+├── DAG_WINDSCAN_demo.mov
+├── Deployment.md                       # Commandes de déploiement pas à pas
 └── README.md
 ```
 

@@ -9,5 +9,5 @@ pip:
   - requests>=2.31.0,<3
   - openpyxl
 env_vars:
-  MLFLOW_TRACKING_URI: "https://atomik31-mlflow-server.hf.space"
+  MLFLOW_TRACKING_URI: "https://atomik31-mlflow.hf.space"
   BUCKET_NAME: "projet-final-dsl-ft37-julien-charlier"
