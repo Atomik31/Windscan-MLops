@@ -16,37 +16,32 @@
 <text x="323" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Modèle / API</text>
 <rect x="440" y="16" width="12" height="12" rx="3" style="fill:rgb(90,30,30);stroke:rgb(220,100,100);stroke-width:0.5px;"/>
 <text x="458" y="26" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:12px;">Monitoring / Réentraînement</text>
+<text x="890" y="22" text-anchor="end" style="fill:rgb(120,120,140);font-family:system-ui,sans-serif;font-size:10px;font-style:italic;">Lint CI (ruff) — repo GitHub</text>
 
 <!-- ===== BANDE 1 : ENTRAÎNEMENT ===== -->
 <text x="450" y="54" text-anchor="middle" style="fill:rgb(194,192,182);font-family:system-ui,sans-serif;font-size:13px;font-style:italic;">Entraînement distribué</text>
 
-<rect x="20" y="64" width="155" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
-<text x="97" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">dataset_train.csv</text>
-<text x="97" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">AWS S3</text>
+<rect x="20" y="64" width="200" height="56" rx="8" style="fill:rgb(12,68,124);stroke:rgb(133,183,235);stroke-width:0.5px;"/>
+<text x="120" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(181,212,244);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">dataset_train.csv</text>
+<text x="120" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">AWS S3</text>
 
-<line x1="175" y1="92" x2="188" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+<line x1="220" y1="92" x2="233" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
 
-<rect x="190" y="64" width="155" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
-<text x="267" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Ray Cluster · K8s</text>
-<text x="267" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">Random Forest · GridSearchCV</text>
+<rect x="235" y="64" width="200" height="56" rx="8" style="fill:rgb(60,52,137);stroke:rgb(175,169,236);stroke-width:0.5px;"/>
+<text x="335" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206,203,246);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">Ray Cluster · K8s</text>
+<text x="335" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175,169,236);font-family:system-ui,sans-serif;font-size:11px;">Random Forest · GridSearchCV</text>
 
-<line x1="345" y1="92" x2="358" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+<line x1="435" y1="92" x2="448" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
 
-<rect x="360" y="64" width="155" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
-<text x="437" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">MLflow Registry</text>
-<text x="437" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">turbine_predictor @production</text>
+<rect x="450" y="64" width="200" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="550" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">MLflow Registry</text>
+<text x="550" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">turbine_predictor @production</text>
 
-<line x1="515" y1="92" x2="528" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
+<line x1="650" y1="92" x2="663" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
 
-<rect x="530" y="64" width="155" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
-<text x="607" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">FastAPI · HF Spaces</text>
-<text x="607" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">POST /predict</text>
-
-<line x1="685" y1="92" x2="698" y2="92" marker-end="url(#arrow)" style="stroke:rgb(156,154,146);stroke-width:1.5px;fill:none;"/>
-
-<rect x="700" y="64" width="165" height="56" rx="8" style="fill:rgb(30,30,50);stroke:rgb(80,80,120);stroke-width:0.5px;"/>
-<text x="782" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(180,180,220);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">GitHub Actions</text>
-<text x="782" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(140,140,180);font-family:system-ui,sans-serif;font-size:11px;">CI/CD · tests + deploy HF</text>
+<rect x="665" y="64" width="200" height="56" rx="8" style="fill:rgb(8,80,65);stroke:rgb(93,202,165);stroke-width:0.5px;"/>
+<text x="765" y="84" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159,225,203);font-family:system-ui,sans-serif;font-size:13px;font-weight:500;">FastAPI · HF Spaces</text>
+<text x="765" y="102" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">POST /predict</text>
 
 <!-- Séparateur 1 -->
 <line x1="10" y1="136" x2="880" y2="136" stroke-dasharray="4 4" style="stroke:rgb(60,60,60);stroke-width:1px;fill:none;"/>
@@ -89,8 +84,8 @@
 <text x="782" y="270" text-anchor="middle" dominant-baseline="central" style="fill:rgb(133,183,235);font-family:system-ui,sans-serif;font-size:11px;">Neon DB (PostgreSQL)</text>
 
 <!-- FastAPI → Predict+Store (inférence) -->
-<path d="M 607 120 L 782 160" fill="none" stroke-dasharray="5 3" marker-end="url(#arrow)" style="stroke:rgb(93,202,165);stroke-width:1.5px;fill:none;"/>
-<text x="704" y="146" text-anchor="middle" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">inférence</text>
+<path d="M 765 120 L 782 160" fill="none" stroke-dasharray="5 3" marker-end="url(#arrow)" style="stroke:rgb(93,202,165);stroke-width:1.5px;fill:none;"/>
+<text x="800" y="142" text-anchor="middle" style="fill:rgb(93,202,165);font-family:system-ui,sans-serif;font-size:11px;">inférence</text>
 
 <!-- Séparateur 2 -->
 <line x1="10" y1="302" x2="880" y2="302" stroke-dasharray="4 4" style="stroke:rgb(60,60,60);stroke-width:1px;fill:none;"/>

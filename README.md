@@ -51,7 +51,7 @@ Un dashboard Streamlit affiche l'état de la turbine 1 : données capteurs netto
 - Neon DB (PostgreSQL managé — stockage des données capteurs et des prédictions)
 - Streamlit + Plotly (dashboard de monitoring)
 - Hugging Face Spaces (MLflow server, API de serving, dashboard)
-- GitHub Actions (CD — déploiement de l'API)
+- GitHub Actions (CI — lint du code avec ruff)
 
 ---
 
@@ -99,7 +99,8 @@ Projet-final/
 │   ├── docker-compose.yaml
 │   └── Dockerfile
 ├── .github/workflows/
-│   └── deploy_api.yml                  # CD : déploiement de modelservedapi sur HF Spaces
+│   └── lint.yml                        # CI : lint du code (ruff) sur push/PR
+├── ruff.toml                            # Config ruff (line-length=120)
 ├── scripts/
 │   └── seed_last_100_hours.py          # One-shot : seed wind_turbine_sensors/predictions (100h)
 ├── DAG_WINDSCAN_demo.mov
