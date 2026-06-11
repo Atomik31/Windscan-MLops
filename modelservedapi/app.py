@@ -2,10 +2,9 @@ import os
 import mlflow
 import pandas as pd
 import uvicorn
-import json
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Literal, List, Union
+from typing import Union
 
 # -----------------------------------------------------------------------------
 # ENV + MLflow setup

@@ -1,1 +1,15 @@
-airlfow/logs/*
+.env
+*.env
+.env.*
+
+__pycache__/
+*.pyc
+*.pyo
+
+.DS_Store
+
+*.sqlite
+*.db
+
+airflow/logs/dag_id=*
+airflow/logs/scheduler/
