@@ -1,8 +1,8 @@
 ![WindScan MLOps](Windscan_MLops.png)
 
-# Maintenance Predictive des Eoliennes — Pipeline MLOps complet
+# Maintenance Predictive des Eoliennes - Pipeline MLOps complet
 
-Projet final de la certification AIA (Architecte en Intelligence Artificielle — Jedha).
+Projet final de la certification AIA (Architecte en Intelligence Artificielle - Jedha).
 
 ---
 
@@ -20,15 +20,15 @@ Un Random Forest entraîné avec `GridSearchCV` (cv=3) sur les données capteurs
 
 Le modèle est enregistré dans MLflow sous `turbine_maintenance_predictor` avec l'alias `production`.
 
-**Serving — FastAPI sur Hugging Face Spaces**
+**Serving - FastAPI sur Hugging Face Spaces**
 
-Une API FastAPI charge le modèle depuis MLflow au démarrage et expose trois endpoints : `/health` (surveillance du conteneur — utilisé par HF Spaces pour vérifier que le service est up), `/predict` (inférence) et `/docs` (Swagger UI généré automatiquement). Elle tourne dans un conteneur Docker déployé sur Hugging Face Spaces.
+Une API FastAPI charge le modèle depuis MLflow au démarrage et expose trois endpoints : `/health` (surveillance du conteneur - utilisé par HF Spaces pour vérifier que le service est up), `/predict` (inférence) et `/docs` (Swagger UI généré automatiquement). Elle tourne dans un conteneur Docker déployé sur Hugging Face Spaces.
 
-**Pipeline d'inférence — DAG Airflow**
+**Pipeline d'inférence - DAG Airflow**
 
 Un DAG se déclenche manuellement et enchaîne 4 tâches : création des tables, extraction d'une ligne aléatoire du dataset de test S3, validation + chargement dans `wind_turbine_sensors`, puis inférence via l'API et stockage dans `wind_turbine_predictions`. Un DAG de monitoring tourne quotidiennement avec Evidently pour détecter le drift et déclencher automatiquement le réentraînement.
 
-**Dashboard de monitoring — Streamlit**
+**Dashboard de monitoring - Streamlit**
 
 Un dashboard Streamlit affiche l'état de la turbine 1 : données capteurs nettoyées (`wind_turbine_sensors` sur Neon DB, alimentée par le DAG Airflow), statistiques sur la fenêtre de temps sélectionnée, et le niveau de maintenance prédit par le modèle (`turbine_maintenance_predictor@production` chargé depuis MLflow). Déployé en conteneur Docker sur Hugging Face Spaces.
 
@@ -42,16 +42,16 @@ Un dashboard Streamlit affiche l'état de la turbine 1 : données capteurs netto
 
 ## Stack
 
-- Python — scikit-learn, pandas, FastAPI, MLflow
+- Python - scikit-learn, pandas, FastAPI, MLflow
 - Ray 2.x + KubeRay (entraînement distribué)
-- Kubernetes — Minikube (cluster local)
+- Kubernetes - Minikube (cluster local)
 - Apache Airflow 2.10 (Docker Compose, LocalExecutor)
 - MLflow Model Registry (Hugging Face Spaces)
 - AWS S3 (données brutes en transit)
-- Neon DB (PostgreSQL managé — stockage des données capteurs et des prédictions)
+- Neon DB (PostgreSQL managé - stockage des données capteurs et des prédictions)
 - Streamlit + Plotly (dashboard de monitoring)
 - Hugging Face Spaces (MLflow server, API de serving, dashboard)
-- GitHub Actions (CI — lint du code avec ruff)
+- GitHub Actions (CI - lint du code avec ruff)
 
 ---
 
@@ -131,4 +131,4 @@ cd airflow && docker-compose up -d
 
 ---
 
-Julien CHARLIER — [(Github : Atomik31)](https://github.com/Atomik31)
+Julien CHARLIER - [(Github : Atomik31)](https://github.com/Atomik31)
